@@ -7,8 +7,8 @@
 #include <iterator>
 #include "xxtea.cpp"
 
-std::string getData(int x, const std::string& key, const std::string& data) {
-    switch (x) {
+std::string getData(int operationId, const std::string& key, const std::string& data) {
+    switch (operationId) {
         // Encrypting
         case 1: {
             auto encryptedBytes = xxtea::encrypt(data, key);
@@ -44,12 +44,12 @@ extern "C" jstring
 Java_com_shevelev_apikeyjniarticle_ApiKeyExtractor_getApiKey(
         JNIEnv *env,
         jobject /* this */,
-        jint id,
+        jint operationId,
         jstring source
 ) {
     std::string key = "c}><EQ~72R<jmz8PGGx5@qS[f^0=aB~N8)F7U+}~QD:5mdZ{+A{ov@Fe$/Bx=Pl=";
     std::string data = env->GetStringUTFChars(source, nullptr);
 
-    std::string result = getData(id, key, data);
+    std::string result = getData(operationId, key, data);
     return env->NewStringUTF(result.c_str());
 }

@@ -1,7 +1,7 @@
 package com.shevelev.apikeyjniarticle
 
 class ApiKeyExtractor {
-    private external fun getApiKey(id: Int, source: String): String
+    private external fun getApiKey(operationId: Int, source: String): String
 
     fun getKey(): String {
         return getApiKey(2, BuildConfig.MY_API_KEY)
@@ -9,7 +9,6 @@ class ApiKeyExtractor {
 
     companion object{
         init {
-            // Load the library
             System.loadLibrary("native-lib")
         }
     }
