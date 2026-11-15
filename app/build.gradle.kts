@@ -1,10 +1,12 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+}
+
+val localProperties = Properties().apply {
+    rootProject.file("local.properties").inputStream().use { load(it) }
 }
 
 android {
@@ -23,7 +25,7 @@ android {
         buildConfigField(
             "String",
             "MY_API_KEY",
-            "\"${gradleLocalProperties(rootDir, providers).getProperty("my_api_key")}\""
+            "\"${localProperties.getProperty("my_api_key")}\""
         )
     }
 
@@ -51,13 +53,7 @@ android {
             version = "4.0.2"
         }
     }
-    android.ndkVersion = "29.0.13599879"
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget = JvmTarget.fromTarget("11")
-    }
+    ndkVersion = "29.0.13599879"
 }
 
 dependencies {
