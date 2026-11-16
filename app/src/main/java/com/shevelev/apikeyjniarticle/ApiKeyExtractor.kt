@@ -1,11 +1,11 @@
 package com.shevelev.apikeyjniarticle
 
 open class ApiKeyExtractor {
-    protected external fun getApiKey(operationId: Int, source: String): String
+    protected external fun encrypt(sourceData: String, sourceKey: String): String
+    protected external fun decrypt(sourceData: String, sourceKey: String): String
+    protected external fun getApiKey(): String
 
-    fun getKey(): String {
-        return getApiKey(2, BuildConfig.MY_API_KEY)
-    }
+    fun getKey(): String = getApiKey()
 
     companion object{
         init {

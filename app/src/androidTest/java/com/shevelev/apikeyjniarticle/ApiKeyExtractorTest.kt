@@ -4,12 +4,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class ApiKeyExtractorTest : ApiKeyExtractor() {
-    fun encrypt(s: String): String {
-        return getApiKey(1, s)
+    fun encryptData(data: String, key: String): String {
+        return encrypt(data, key)
     }
 
-    fun decrypt(s: String): String {
-        return getApiKey(2, s)
+    fun decryptData(data: String, key: String): String {
+        return decrypt(data, key)
     }
 
     @Test
@@ -17,10 +17,11 @@ class ApiKeyExtractorTest : ApiKeyExtractor() {
         // Arrange
         val source = "In a distant and second-hand set of dimensions, in an astral plane that " +
             "was never meant to fly, the curling star-mists waver and part..."
+        val key = "@qyj%4m4JV#EWfc%PWUR8BnbM**&5z9#@zg!g3XUkE9EF94gAEV6M%!j*4gp!MH#"
 
         // Act
-        val encrypted = encrypt(source)
-        val decrypted = decrypt(encrypted)
+        val encrypted = encryptData(source, key)
+        val decrypted = decryptData(encrypted, key)
 
         // Assert
         assertEquals(source, decrypted)
