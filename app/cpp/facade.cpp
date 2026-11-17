@@ -6,13 +6,13 @@
 #include <sstream>
 #include <iterator>
 #include "consts.h"
-#include "xxtea.cpp"
+#include "crypto_alg.h"
 
 std::string getData(int operationId, const std::string& key, const std::string& data) {
     switch (operationId) {
         // Encrypting
         case 1: {
-            auto encryptedBytes = xxtea::encrypt(data, key);
+            auto encryptedBytes = CryptoAlg::encrypt(data, key);
 
             std::stringstream result;
 
@@ -34,7 +34,7 @@ std::string getData(int operationId, const std::string& key, const std::string& 
                     std::istream_iterator<std::uint32_t>()
             };
 
-            return xxtea::decrypt(bytesToDecrypt, key);
+            return CryptoAlg::decrypt(bytesToDecrypt, key);
         }
 
         default: return "";

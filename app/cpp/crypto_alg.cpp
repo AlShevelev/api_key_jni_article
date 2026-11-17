@@ -1,9 +1,9 @@
-#pragma once
 #include <vector>
 #include <string>
 #include <cstdint>
 #include <climits>
 #include <limits>
+#include "crypto_alg.h"
 
 /**
  * XXTEA encryption algorithm library for C++.
@@ -21,10 +21,10 @@
 #define XXTEA_NUMBER_OF_MIXES 6
 #define XXTEA_MX (((z>>5U^y<<2U) + (y>>3U^z<<4U)) ^ ((sum^y) + (k[(p&3U)^e] ^ z)))
 
-namespace xxtea {
-    using bytes = std::vector<std::uint32_t>;
-
+namespace CryptoAlg {
     namespace internal {
+        constexpr unsigned long delta{0x9E3779B9};
+
         constexpr std::size_t round_up(std::size_t num, std::size_t multiple) {
             auto remainder = num % multiple;
             if (remainder == 0) {
@@ -83,85 +83,82 @@ namespace xxtea {
             return s;
         }
 
-        constexpr unsigned long delta{0x9E3779B9};
-    }
-
-/**
+        /**
  * encodes an array of unsigned 32-bit integers using 128-bit key.
  * @param v vector of uint32
  * @param k 128-bit key, if smaller the vector will be padded
  */
-    inline void encode(bytes &v, const bytes &k) {
-        if (v.empty()) {
-            return;
-        }
-
-        auto n = v.size();
-
-        unsigned long z{v[n - 1]};
-        unsigned long y{v[0]};
-        unsigned long sum = 0;
-        long rounds = XXTEA_NUMBER_OF_MIXES + 52 / n;
-        std::size_t p;
-
-        while (rounds-- > 0) {
-            sum += internal::delta;
-            unsigned long e = (sum >> 2U) & 3U;
-            for (p = 0; p < n - 1; ++p) {
-                y = v[p + 1];
-                v[p] += XXTEA_MX;
-                z = v[p];
-
+        inline void encode(bytes &v, const bytes &k) {
+            if (v.empty()) {
+                return;
             }
-            y = v[0];
-            v[n - 1] += XXTEA_MX;
-            z = v[n - 1];
+
+            auto n = v.size();
+
+            unsigned long z{v[n - 1]};
+            unsigned long y{v[0]};
+            unsigned long sum = 0;
+            long rounds = XXTEA_NUMBER_OF_MIXES + 52 / n;
+            std::size_t p;
+
+            while (rounds-- > 0) {
+                sum += internal::delta;
+                unsigned long e = (sum >> 2U) & 3U;
+                for (p = 0; p < n - 1; ++p) {
+                    y = v[p + 1];
+                    v[p] += XXTEA_MX;
+                    z = v[p];
+
+                }
+                y = v[0];
+                v[n - 1] += XXTEA_MX;
+                z = v[n - 1];
+            }
         }
-    }
 
 /**
  * decodes an array of unsigned 32-bit integers using 128-bit key.
  * @param v array to be decoded
  * @param k 128-bit key
  */
-    inline void decode(bytes &v, const bytes &k) {
-        if (v.empty()) {
-            return;
-        }
-
-        auto n = v.size();
-
-        unsigned long z{v[n - 1]};
-        unsigned long y{v[0]};
-        long rounds = XXTEA_NUMBER_OF_MIXES + 52 / n;
-        unsigned long sum = rounds * internal::delta;
-        std::size_t p;
-
-        for (; sum != 0; sum -= internal::delta) {
-            unsigned long e = (sum >> 2U) & 3U;
-            for (p = n - 1; p > 0; --p) {
-                z = v[p - 1];
-                v[p] -= XXTEA_MX;
-                y = v[p];
-
+        inline void decode(bytes &v, const bytes &k) {
+            if (v.empty()) {
+                return;
             }
-            z = v[n - 1];
-            v[0] -= XXTEA_MX;
-            y = v[0];
+
+            auto n = v.size();
+
+            unsigned long z{v[n - 1]};
+            unsigned long y{v[0]};
+            long rounds = XXTEA_NUMBER_OF_MIXES + 52 / n;
+            unsigned long sum = rounds * internal::delta;
+            std::size_t p;
+
+            for (; sum != 0; sum -= internal::delta) {
+                unsigned long e = (sum >> 2U) & 3U;
+                for (p = n - 1; p > 0; --p) {
+                    z = v[p - 1];
+                    v[p] -= XXTEA_MX;
+                    y = v[p];
+
+                }
+                z = v[n - 1];
+                v[0] -= XXTEA_MX;
+                y = v[0];
+            }
         }
     }
-
 /**
  *  Encrypts text using Corrected Block TEA (aka xxtea) algorithm
  * @param plaintext String to be encrypted. Handles utf-8.
  * @param password Password to be used for encryption (only 128 bits are used).
  * @return Encrypted text as uint32_t vector
  */
-    inline bytes encrypt(const std::string &plaintext, const std::string &password) {
+    bytes encrypt(const std::string &plaintext, const std::string &password) {
         auto text = internal::to_blocks<std::uint32_t>(plaintext);
         auto key = internal::to_blocks<std::uint32_t>(password);
 
-        encode(text, key);
+        internal::encode(text, key);
 
         return text;
     }
@@ -172,10 +169,10 @@ namespace xxtea {
  * @param password password used to encrypt the string
  * @return utf8 encoded string
  */
-    inline std::string decrypt(bytes &encrypted_string, const std::string &password) {
+    std::string decrypt(bytes &encrypted_string, const std::string &password) {
         auto key = internal::to_blocks<std::uint32_t>(password);
 
-        decode(encrypted_string, key);
+        internal::decode(encrypted_string, key);
 
         return internal::to_string<std::uint32_t>(encrypted_string);
     }
