@@ -10,7 +10,7 @@
 
 std::string getData(int operationId, const std::string& key, const std::string& data) {
     switch (operationId) {
-        // Encrypting
+        // Encryption
         case 1: {
             auto encryptedBytes = CryptoAlg::encrypt(data, key);
 
@@ -25,7 +25,7 @@ std::string getData(int operationId, const std::string& key, const std::string& 
             return result.str();
         }
 
-        // Decrypting
+        // Decryption
         case 2: {
             std::istringstream inputStream(data);
 
@@ -42,30 +42,17 @@ std::string getData(int operationId, const std::string& key, const std::string& 
 }
 
 extern "C" jstring
-Java_com_shevelev_apikeyjniarticle_ApiKeyExtractor_encrypt(
+Java_com_shevelev_apikeyjniarticle_ApiKeyExtractor_encryptOrDecrypt(
         JNIEnv *env,
         jobject /* this */,
+        jint operationId,
         jstring sourceData,
         jstring sourceKey
 ) {
     std::string key = env->GetStringUTFChars(sourceKey, nullptr);
     std::string data = env->GetStringUTFChars(sourceData, nullptr);
 
-    std::string result = getData(1, key, data);
-    return env->NewStringUTF(result.c_str());
-}
-
-extern "C" jstring
-Java_com_shevelev_apikeyjniarticle_ApiKeyExtractor_decrypt(
-        JNIEnv *env,
-        jobject /* this */,
-        jstring sourceData,
-        jstring sourceKey
-) {
-    std::string key = env->GetStringUTFChars(sourceKey, nullptr);
-    std::string data = env->GetStringUTFChars(sourceData, nullptr);
-
-    std::string result = getData(2, key, data);
+    std::string result = getData(operationId, key, data);
     return env->NewStringUTF(result.c_str());
 }
 

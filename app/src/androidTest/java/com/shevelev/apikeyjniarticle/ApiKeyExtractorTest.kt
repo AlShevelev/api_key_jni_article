@@ -5,11 +5,11 @@ import org.junit.Test
 
 class ApiKeyExtractorTest : ApiKeyExtractor() {
     fun encryptData(data: String, key: String): String {
-        return encrypt(data, key)
+        return encryptOrDecrypt(1, data, key)
     }
 
     fun decryptData(data: String, key: String): String {
-        return decrypt(data, key)
+        return encryptOrDecrypt(2, data, key)
     }
 
     @Test

@@ -150,13 +150,13 @@ namespace CryptoAlg {
     }
 /**
  *  Encrypts text using Corrected Block TEA (aka xxtea) algorithm
- * @param plaintext String to be encrypted. Handles utf-8.
- * @param password Password to be used for encryption (only 128 bits are used).
+ * @param plainText String to be encrypted. Handles utf-8.
+ * @param encryptionKey Password to be used for encryption (only 128 bits are used).
  * @return Encrypted text as uint32_t vector
  */
-    bytes encrypt(const std::string &plaintext, const std::string &password) {
-        auto text = internal::to_blocks<std::uint32_t>(plaintext);
-        auto key = internal::to_blocks<std::uint32_t>(password);
+    bytes encrypt(const std::string &plainText, const std::string &encryptionKey) {
+        auto text = internal::to_blocks<std::uint32_t>(plainText);
+        auto key = internal::to_blocks<std::uint32_t>(encryptionKey);
 
         internal::encode(text, key);
 
@@ -169,8 +169,8 @@ namespace CryptoAlg {
  * @param password password used to encrypt the string
  * @return utf8 encoded string
  */
-    std::string decrypt(bytes &encrypted_string, const std::string &password) {
-        auto key = internal::to_blocks<std::uint32_t>(password);
+    std::string decrypt(bytes &encrypted_string, const std::string &encryptionKey) {
+        auto key = internal::to_blocks<std::uint32_t>(encryptionKey);
 
         internal::decode(encrypted_string, key);
 
